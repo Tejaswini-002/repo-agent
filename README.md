@@ -5,7 +5,7 @@ This repo provides a **sure working** "Step 1" monitoring agent for GitHub repos
 ✅ Monitors **every push/commit** on **all branches**  
 ✅ Monitors PR updates (opened / reopened / synchronize)  
 ✅ Prints commit + changed files in **GitHub Actions logs**  
-✅ (Optional) Leaves a simple confirmation comment on PRs (still no LLM)
+✅ (Optional) Leaves a simple confirmation comment on PR
 
 ---
 
