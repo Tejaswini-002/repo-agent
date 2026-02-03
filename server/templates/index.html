@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Repo Monitor — Live PR Events</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Roboto, Helvetica, Arial; margin: 20px; }
+      h1 { font-size: 1.4rem; }
+      .event { border: 1px solid #e1e4e8; padding: 10px; margin: 8px 0; border-radius: 6px; }
+      .meta { color: #586069; font-size: 0.9rem; }
+      pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+  </head>
+  <body>
+    <h1>Repo Monitor — Live PR Events</h1>
+    <div id="events"></div>
+
+    <script>
+      const eventsEl = document.getElementById('events');
+      const es = new EventSource('/events');
+      es.onmessage = (e) => {
+        try {
+          const obj = JSON.parse(e.data);
+          const el = document.createElement('div');
+          el.className = 'event';
+          if (obj.event_name === 'pull_request' && obj.summary) {
+            const s = obj.summary;
+            el.innerHTML = `<div class="meta">${s.repo} — PR #${s.pr_number} — ${s.action}</div>` +
+              `<strong>${escapeHtml(s.title || '')}</strong><br/>` +
+              `<div class="meta">By ${escapeHtml(s.user || '')} — changed files: ${s.changed_files_count || 0}</div>`;
+            if (s.files) {
+              const list = document.createElement('pre');
+              list.textContent = s.files.map(f => `${f.status}\t${f.filename}`).join('\n');
+              el.appendChild(list);
+            }
+          } else {
+            el.textContent = JSON.stringify(obj, null, 2);
+          }
+          eventsEl.insertBefore(el, eventsEl.firstChild);
+        } catch (err) {
+          console.error('parse error', err);
+        }
+      };
+
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]));
+      }
+    </script>
+  </body>
+</html>

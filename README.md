@@ -99,3 +99,100 @@ Then rerun workflow or push again.
 ## Notes
 - No ngrok, no webhooks, no server required for Step 1.
 - This is the best starting point for “monitor my repo and commits”.
+
+---
+
+## Real-time Webhook UI (optional)
+
+This repository includes an optional Flask-based webhook server and a tiny UI that streams PR events in real time.
+
+Files added:
+- `server/app.py` — Flask server handling `/webhook` and Server-Sent Events `/events`.
+- `server/templates/index.html` — live UI that connects to `/events`.
+- `server/pdf_logger.py` — PDF export for PR event summaries.
+
+### Quick start with ngrok (helper script)
+
+If you have ngrok installed, the repository includes a convenience script to start the Flask server + ngrok and print the public webhook URL.
+
+1. Make the helper executable:
+
+```bash
+chmod +x scripts/start_with_ngrok.sh
+```
+
+2. Run it (optional: pass `PORT` and `SECRET`):
+
+```bash
+./scripts/start_with_ngrok.sh 5002 your-webhook-secret
+```
+
+The script starts the server and ngrok, then prints the public `https://.../webhook` URL you should enter into your GitHub App webhook settings (Content type: `application/json`).
+
+3. (Optional) Use the `.env.example` as a starting point for environment variables.
+
+Note: This helper assumes you have the `ngrok` binary installed and available on your PATH. It uses ngrok's local API at `http://127.0.0.1:4040` to discover the public tunnel URL.
+
+### Manual setup (recommended)
+
+1. Install dependencies:
+
+```bash
+pip3 install -r requirements.txt
+```
+
+2. Create a `.env` file (copy from `.env.example` and fill in your secrets):
+
+```bash
+cp .env.example .env
+# Edit .env with your webhook secret and GitHub token
+```
+
+3. Start the server:
+
+```bash
+export $(grep -v '^#' .env | xargs)
+python3 server/app.py
+```
+
+   Server runs at `http://localhost:5002` (or your chosen `PORT`).
+
+4. Open the UI in a browser at `http://localhost:5002/`.
+
+5. Configure your GitHub App webhook to post to your server (via ngrok or direct URL):
+   - Webhook URL: `https://<your-public-url>/webhook/github` (supports both `/webhook` and `/webhook/github`)
+   - Content type: `application/json`
+   - Secret: set to the same value as `GITHUB_WEBHOOK_SECRET` in your `.env`
+   - Events: subscribe to "Pull request"
+
+### Available endpoints
+
+- `GET /` — Live UI showing PR events in real-time
+- `POST /webhook` or `POST /webhook/github` — Receives GitHub webhook payloads
+- `GET /events` — Server-Sent Events stream of all events (consumed by UI)
+- `GET /health` — Health check
+- `GET /stats` — Statistics (event count, PDF support status)
+- `GET /pdf` — Export recent PR events as a PDF report
+
+### Environment variables
+
+- `PORT` — port the server listens on (default: 5000)
+- `GITHUB_WEBHOOK_SECRET` — HMAC secret to validate incoming webhooks (optional but recommended)
+- `GITHUB_TOKEN` — GitHub API token to fetch PR file lists (optional; if set, enables detailed file change reporting)
+- `MONITOR_EVENTS_PATH` — path to append JSONL events (default: `repo-monitor-events.jsonl`)
+
+### PDF export
+
+The server can export PR event summaries as a formatted PDF:
+
+```bash
+# Export and download
+curl http://localhost:5002/pdf -o pr_report.pdf
+
+# Or via the UI
+```
+
+The PDF includes:
+- Event timestamp, PR number, action (opened/synchronize/etc)
+- Repository, title, author
+- Changed files count and detailed file list (if fetched via GITHUB_TOKEN)
