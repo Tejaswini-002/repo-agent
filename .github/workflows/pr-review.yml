@@ -31,7 +31,7 @@ jobs:
 
       - name: Run PR review
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
           LLM_PROVIDER: foundry_local
           FOUNDRY_LOCAL_BASE_URL: http://localhost:8000
           FOUNDRY_LOCAL_MODEL: foundry-local-model
