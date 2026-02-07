@@ -9,7 +9,7 @@ This repo provides a **sure working** "Step 1" monitoring agent for GitHub repos
 
 ---
 
-## 1) What you get
+## 1) What you get is
 
 - `.github/workflows/repo-monitor.yml`  
   Runs on every push and PR update
