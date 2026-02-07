@@ -1,0 +1,217 @@
+# LLM Configuration (Using Ollama - Free & Open Source)
+llm:
+  model: "llama3"                    # Ollama model: llama3, mistral, codellama
+  provider: "foundry_local"          # foundry_local (local), ollama
+  api_key_env: ""                    # No API key needed for Ollama
+  temperature: 0.3                   # Lower = deterministic (good for analysis)
+  max_tokens: 2000                   # Maximum response length
+  timeout: 60                        # API timeout in seconds
+  retry_attempts: 3                  # Retry failed API calls
+  retry_delay: 2                     # Delay between retries (seconds)
+  foundry_local:
+    base_url: "http://localhost:8000" # Foundry Local endpoint
+    model: ""                        # Override with FOUNDRY_LOCAL_MODEL
+    api_key_env: "FOUNDRY_LOCAL_API_KEY"
+
+# PR Analysis Configuration (LangChain Integration)
+pr_analysis:
+  enabled: true                      # Enable PR analysis feature
+  provider: "ollama"                 # ollama (local), openai, or anthropic
+  
+  # OpenAI Settings
+  openai:
+    model: "gpt-4o-mini"             # Use faster mini model for analysis
+    api_key_env: "OPENAI_API_KEY"
+    temperature: 0.3                 # Keep consistent results
+    max_tokens: 1500
+  
+  # Anthropic Claude Settings
+  anthropic:
+    model: "claude-3-5-sonnet-20241022"
+    api_key_env: "ANTHROPIC_API_KEY"
+    max_tokens: 1024
+  
+  # Analysis Features
+  features:
+    generate_summary: true           # Summarize PR changes
+    identify_key_changes: true       # List main modifications
+    assess_impact: true              # Evaluate impact level
+    suggest_tests: true              # Recommend test cases
+    flag_issues: true                # Highlight potential problems
+    provide_recommendations: true    # Give improvement suggestions
+  
+  # Output Format
+  output:
+    format: "json"                   # json or markdown
+    include_statistics: true         # Include file/line stats
+    include_language_breakdown: true # Show language distribution
+    max_summary_length: 500          # Characters for summary
+
+# PR Review (CodeRabbit-style)
+pr_review:
+  enabled: true
+  auto_on_webhook: true              # Run on pull_request events
+  reply_to_mentions: true            # Reply to review comments with mention
+  light_model: "llama3"              # Summary + release notes
+  heavy_model: "llama3"              # Line-by-line review
+  review_simple_changes: false       # Skip simple changes by default
+  simple_change_threshold: 20        # Total lines changed to consider simple
+  skip_extensions: ["md", "txt", "rst", "png", "jpg", "jpeg", "gif"]
+  bot_mention: "@repo-monitor"
+
+# Agent Configuration
+agent:
+  name: "Repo Monitor Agent"
+  description: "AI-powered GitHub repository monitoring and analysis"
+  max_iterations: 10                 # Maximum ReAct loop iterations
+  confidence_threshold: 0.7          # Min confidence to accept result
+  enable_memory: true                # Enable learning from past queries
+  enable_self_correction: true       # Allow agent to fix mistakes
+
+# Context Layers (6-layer system)
+context:
+  enable_schema_context: true        # Layer 1: Repository schema
+  enable_annotation_context: true    # Layer 2: Human annotations
+  enable_code_enrichment_context: true    # Layer 3: Code lineage
+  enable_knowledge_base_context: true     # Layer 4: Knowledge docs
+  enable_memory_context: true        # Layer 5: Learned patterns
+  enable_runtime_context: true       # Layer 6: Live data
+
+# Vector Store (ChromaDB)
+vector_store:
+  enabled: true
+  provider: "chromadb"               # chromadb, pinecone, weaviate
+  chromadb_host: "localhost"
+  chromadb_port: 8003
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  collection_name: "repo-monitor"
+  similarity_threshold: 0.5
+
+# Tool Configuration
+tools:
+  github_api:
+    enabled: true
+    base_url: "https://api.github.com"
+    timeout: 10
+    rate_limit_buffer: 0.8
+  
+  get_monitored_events:
+    enabled: true
+    max_results: 100
+    event_types: [PushEvent, PullRequestEvent, IssuesEvent, IssueCommentEvent]
+
+# API Configuration
+api:
+  host: "0.0.0.0"                   # Bind address
+  port: 8000                         # Port number
+  debug: false                       # Enable debug mode
+  reload: false                      # Hot reload on file changes
+  workers: 4                         # Number of worker processes
+  cors:
+    enabled: true
+    origins: ["*"]                   # CORS allowed origins
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+
+# GitHub Configuration
+github:
+  user: "Tejaswini-002"             # GitHub username
+  token_env: "GITHUB_TOKEN"         # Environment variable for token
+  api_version: "2022-11-28"         # GitHub API version
+  timeout: 10
+  
+  # MCP Server Integration
+  mcp:
+    enabled: true
+    host: "localhost"
+    port: 8001
+    type: "remote"                  # remote, docker, binary
+
+# Memory Storage
+memory:
+  type: "json"                      # json, sqlite, postgresql
+  storage_path: "./data/memory/"
+  auto_save: true
+  save_interval: 300                # Save every 5 minutes
+  max_entries: 1000
+
+# Retrieval Configuration
+retrieval:
+  method: "semantic"                # semantic, bm25, hybrid
+  top_k: 5                          # Number of results to retrieve
+  min_relevance_score: 0.3
+  
+  knowledge_base:
+    path: "./data/knowledge/"
+    index_on_startup: true
+    auto_update: true
+  
+  memory:
+    path: "./data/memory/"
+    include_global: true
+    include_session: true
+
+# Data Paths
+data:
+  annotations_path: "./data/annotations/"
+  knowledge_base_path: "./data/knowledge/"
+  evals_path: "./data/evals/"
+  memory_path: "./data/memory/"
+  sample_repos_path: "./data/sample_repos/"
+
+# Logging Configuration
+logging:
+  level: "INFO"                     # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/repo-monitor.log"
+  max_file_size: 10485760           # 10MB
+  backup_count: 5
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  auto_run_on_startup: false
+  suite_path: "./data/evals/sample_queries.yaml"
+  grade_method: "llm"               # llm, exact, similarity
+  save_results: true
+  results_path: "./data/evals/results/"
+
+# Monitoring & Metrics
+monitoring:
+  enabled: true
+  prometheus_metrics: false
+  metrics_port: 9090
+  track_queries: true
+  track_tool_usage: true
+  track_context_layers: true
+
+# Repository Monitoring
+repository_monitoring:
+  enabled: true
+  poll_interval: 300                # Poll every 5 minutes
+  event_retention: 86400            # Keep events for 24 hours
+  repositories: []                  # Empty = all accessible repos
+  
+  event_types:
+    - PushEvent
+    - PullRequestEvent
+    - IssuesEvent
+    - IssueCommentEvent
+    - PullRequestReviewEvent
+
+# Development Settings
+development:
+  debug: false
+  verbose_logging: false
+  skip_api_key_validation: false
+  mock_responses: false
+  test_mode: false
+
+# Feature Flags
+features:
+  self_correction: true             # Enable mistake correction
+  learning: true                    # Enable memory learning
+  semantic_search: true             # Enable semantic search
+  multi_turn_conversation: true     # Enable multi-turn chats
+  explain_reasoning: true           # Show agent reasoning

@@ -1,5 +1,4 @@
 repo-monitor-events.jsonl
 .venv/
-__pycache__/.env
+__pycache__/
 .env
-.github/workflows/

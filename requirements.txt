@@ -1,3 +1,31 @@
 Flask>=2.0
 requests>=2.0
 reportlab>=3.6.0
+mcp>=0.1.0
+httpx>=0.24.0
+
+# Web Framework & Async
+FastAPI>=0.104.0
+uvicorn>=0.24.0
+Streamlit>=1.28.0
+python-socketio>=5.9.0
+
+# LLM & LangChain Integration (Free & Open Source)
+langchain>=0.1.0
+langchain-community>=0.1.0
+ollama>=0.1.0
+langchain-chroma>=0.1.0
+
+# Vector Database & RAG
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# Data & ML
+pydantic>=2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+python-dotenv>=1.0.0
+
+# Testing & Dev
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
