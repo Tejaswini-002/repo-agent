@@ -507,6 +507,22 @@ def get_push_analysis():
     return jsonify(LAST_PUSH_ANALYSIS or {}), 200
 
 
+@app.route("/api/events", methods=["GET"])
+def get_recent_events():
+    """Return recent webhook events (debug)"""
+    with EVENTS_LOCK:
+        events = list(RECENT_EVENTS)[-50:]
+    return jsonify({"count": len(events), "events": events}), 200
+
+
+@app.route("/api/events/last", methods=["GET"])
+def get_last_event():
+    """Return the last webhook event (debug)"""
+    with EVENTS_LOCK:
+        last = RECENT_EVENTS[-1] if RECENT_EVENTS else None
+    return jsonify({"event": last}), 200
+
+
 @app.route("/api/health", methods=["GET"])
 def health():
     """Health check"""
