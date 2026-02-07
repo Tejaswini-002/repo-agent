@@ -23,7 +23,7 @@ async def main():
     service = PRReviewService(
         light_model=os.getenv("REVIEW_LIGHT_MODEL", os.getenv("FOUNDRY_LOCAL_MODEL", "llama3")),
         heavy_model=os.getenv("REVIEW_HEAVY_MODEL", os.getenv("FOUNDRY_LOCAL_MODEL", "llama3")),
-        github_token=os.getenv("GITHUB_TOKEN"),
+        github_token=os.getenv("WORKFLOW_TOKEN"),
         review_simple_changes=os.getenv("REVIEW_SIMPLE_CHANGES", "0") == "1",
         simple_change_threshold=int(os.getenv("REVIEW_SIMPLE_THRESHOLD", "20")),
     )
