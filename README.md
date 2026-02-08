@@ -30,7 +30,7 @@ Copy into your repo:
 - `scripts/monitor.py`
 - `scripts/comment_pr.py`
 
-Commit + push.
+Commit + push. Commit and push.
 
 ### B) Or: use this as a template repo
 - Create a new repo on GitHub
