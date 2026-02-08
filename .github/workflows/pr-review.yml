@@ -1,0 +1,47 @@
+name: PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review_comment:
+    types: [created]
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}-${{ github.event_name == 'pull_request_review_comment' && 'pr_comment' || 'pr' }}
+  cancel-in-progress: ${{ github.event_name != 'pull_request_review_comment' }}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run PR review
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          LLM_PROVIDER: foundry_local
+          FOUNDRY_LOCAL_BASE_URL: http://localhost:8000
+          FOUNDRY_LOCAL_MODEL: foundry-local-model
+          FOUNDRY_LOCAL_API_KEY: ""
+          REVIEW_SIMPLE_CHANGES: "0"
+          REVIEW_SIMPLE_THRESHOLD: "20"
+          REVIEW_MAX_COMMENTS: "20"
+          REVIEW_MAX_FILES: "0"
+          REVIEW_COMMENT_LGTM: "0"
+          REVIEW_BOT_MENTION: "@coderabbitai"
+          REVIEW_IGNORE_KEYWORD: "@coderabbitai: ignore"
+          REVIEW_UPDATE_DESCRIPTION: "1"
+        run: python scripts/run_pr_review.py
