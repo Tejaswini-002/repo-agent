@@ -1,4 +1,4 @@
-# Repo Monitor Agent (Step 1 — No LLM)
+# Repo Monitor Agent (Step 1)
 
 This repo provides a **sure working** "Step 1" monitoring agent for GitHub repositories.
 
