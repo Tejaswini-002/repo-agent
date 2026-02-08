@@ -1,4 +1,4 @@
-# Repo Monitor Agent
+# Repo Monitor Agent (Step 1)
 
 Minimal setup for webhook PR review + GitHub Actions flow.
 
@@ -10,6 +10,40 @@ Minimal setup for webhook PR review + GitHub Actions flow.
 ## Webhook server
 Start the server (Foundry Local example):
 
+## 1) What you get
+
+- `.github/workflows/repo-monitor.yml`  
+  Runs on every push and PR update
+- `scripts/monitor.py`  
+  Prints last commit info + changed files.
+- `scripts/comment_pr.py`  
+  Posts a simple PR comment on PR events (no LLM).
+
+---
+
+## 2) How to use in your repo
+
+### A) Easiest: copy these files into your target repo
+Copy into your repo:
+
+- `.github/workflows/repo-monitor.yml`
+- `scripts/monitor.py`
+- `scripts/comment_pr.py`
+
+Commit + push.
+
+### B) Or: use this as a template repo
+- Create a new repo on GitHub
+- Upload these files (or push this repo)
+- Enable Actions (default is enabled)
+
+---
+
+## 3) How to run locally (CMD)
+
+> Local run is only for **testing**. Monitoring actually happens on GitHub via Actions.
+
+### macOS / Linux
 ```bash
 LLM_PROVIDER=foundry_local \
 FOUNDRY_LOCAL_BASE_URL=http://localhost:8000 \
